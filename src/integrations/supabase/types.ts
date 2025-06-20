@@ -9,9 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_generations: {
+        Row: {
+          cost: number | null
+          created_at: string
+          id: string
+          image_url: string
+          prompt: string
+          session_token: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          id?: string
+          image_url: string
+          prompt: string
+          session_token?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          prompt?: string
+          session_token?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_used: boolean | null
+          prompt: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_used?: boolean | null
+          prompt: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_used?: boolean | null
+          prompt?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
-          cart_session_id: string
+          cart_session_id: string | null
           cart_token_id: string | null
           color: string | null
           created_at: string
@@ -25,7 +85,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          cart_session_id: string
+          cart_session_id?: string | null
           cart_token_id?: string | null
           color?: string | null
           created_at?: string
@@ -39,7 +99,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          cart_session_id?: string
+          cart_session_id?: string | null
           cart_token_id?: string | null
           color?: string | null
           created_at?: string
@@ -147,6 +207,189 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      dtf_production_status: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          production_status: string
+          started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          production_status?: string
+          started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          production_status?: string
+          started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dtf_production_status_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          lottery_id: string | null
+          order_id: string | null
+          recipient_email: string
+          recipient_name: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          lottery_id?: string | null
+          order_id?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          lottery_id?: string | null
+          order_id?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_lottery_id_fkey"
+            columns: ["lottery_id"]
+            isOneToOne: false
+            referencedRelation: "lotteries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_settings: {
+        Row: {
+          created_at: string
+          from_email: string
+          from_name: string
+          id: string
+          is_active: boolean
+          smtp_host: string
+          smtp_password: string
+          smtp_port: number
+          smtp_secure: boolean
+          smtp_user: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_email?: string
+          from_name?: string
+          id?: string
+          is_active?: boolean
+          smtp_host?: string
+          smtp_password: string
+          smtp_port?: number
+          smtp_secure?: boolean
+          smtp_user: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_email?: string
+          from_name?: string
+          id?: string
+          is_active?: boolean
+          smtp_host?: string
+          smtp_password?: string
+          smtp_port?: number
+          smtp_secure?: boolean
+          smtp_user?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          created_at: string
+          html_content: string
+          id: string
+          is_active: boolean
+          name: string
+          subject: string
+          type: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          created_at?: string
+          html_content: string
+          id?: string
+          is_active?: boolean
+          name: string
+          subject: string
+          type: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          created_at?: string
+          html_content?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          subject?: string
+          type?: string
+          updated_at?: string
+          variables?: Json
         }
         Relationships: []
       }
@@ -296,28 +539,49 @@ export type Database = {
           created_at: string | null
           customization: Json | null
           id: string
+          lottery_name: string | null
+          mockup_recto_url: string | null
+          mockup_verso_url: string | null
           order_id: string
           price: number
           product_id: string
           quantity: number
+          selected_color: string | null
+          selected_size: string | null
+          visual_back_url: string | null
+          visual_front_url: string | null
         }
         Insert: {
           created_at?: string | null
           customization?: Json | null
           id?: string
+          lottery_name?: string | null
+          mockup_recto_url?: string | null
+          mockup_verso_url?: string | null
           order_id: string
           price: number
           product_id: string
           quantity: number
+          selected_color?: string | null
+          selected_size?: string | null
+          visual_back_url?: string | null
+          visual_front_url?: string | null
         }
         Update: {
           created_at?: string | null
           customization?: Json | null
           id?: string
+          lottery_name?: string | null
+          mockup_recto_url?: string | null
+          mockup_verso_url?: string | null
           order_id?: string
           price?: number
           product_id?: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          visual_back_url?: string | null
+          visual_front_url?: string | null
         }
         Relationships: [
           {
@@ -341,19 +605,24 @@ export type Database = {
           created_at: string | null
           delivery_notes: string | null
           guest_email: string | null
+          hd_url: string | null
           id: string
           payment_intent_id: string | null
           payment_status: string | null
+          preview_url: string | null
           session_id: string | null
           shipping_address: string | null
           shipping_city: string | null
+          shipping_cost: number | null
           shipping_country: string | null
           shipping_email: string | null
           shipping_first_name: string | null
           shipping_last_name: string | null
+          shipping_option_id: string | null
           shipping_phone: string | null
           shipping_postal_code: string | null
           status: string
+          subtotal: number | null
           total_amount: number
           updated_at: string | null
           user_id: string | null
@@ -362,19 +631,24 @@ export type Database = {
           created_at?: string | null
           delivery_notes?: string | null
           guest_email?: string | null
+          hd_url?: string | null
           id?: string
           payment_intent_id?: string | null
           payment_status?: string | null
+          preview_url?: string | null
           session_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_country?: string | null
           shipping_email?: string | null
           shipping_first_name?: string | null
           shipping_last_name?: string | null
+          shipping_option_id?: string | null
           shipping_phone?: string | null
           shipping_postal_code?: string | null
           status?: string
+          subtotal?: number | null
           total_amount: number
           updated_at?: string | null
           user_id?: string | null
@@ -383,24 +657,37 @@ export type Database = {
           created_at?: string | null
           delivery_notes?: string | null
           guest_email?: string | null
+          hd_url?: string | null
           id?: string
           payment_intent_id?: string | null
           payment_status?: string | null
+          preview_url?: string | null
           session_id?: string | null
           shipping_address?: string | null
           shipping_city?: string | null
+          shipping_cost?: number | null
           shipping_country?: string | null
           shipping_email?: string | null
           shipping_first_name?: string | null
           shipping_last_name?: string | null
+          shipping_option_id?: string | null
           shipping_phone?: string | null
           shipping_postal_code?: string | null
           status?: string
+          subtotal?: number | null
           total_amount?: number
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_shipping_option_id_fkey"
+            columns: ["shipping_option_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_options"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -515,6 +802,141 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_options: {
+        Row: {
+          created_at: string
+          description: string | null
+          estimated_days_max: number
+          estimated_days_min: number
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          priority: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          estimated_days_max?: number
+          estimated_days_min?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          price?: number
+          priority?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          estimated_days_max?: number
+          estimated_days_min?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          priority?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_networks: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          priority: number
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          icon: string
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      theme_settings: {
+        Row: {
+          accent_color: string
+          background_image: string | null
+          border_radius: number
+          button_style: string
+          created_at: string
+          glassmorphism_intensity: number
+          id: string
+          primary_color: string
+          star_density: number
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string
+          background_image?: string | null
+          border_radius?: number
+          button_style?: string
+          created_at?: string
+          glassmorphism_intensity?: number
+          id?: string
+          primary_color?: string
+          star_density?: number
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string
+          background_image?: string | null
+          border_radius?: number
+          button_style?: string
+          created_at?: string
+          glassmorphism_intensity?: number
+          id?: string
+          primary_color?: string
+          star_density?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       winners: {
         Row: {
           claimed: boolean | null
@@ -555,13 +977,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_lottery_entries_for_order: {
+        Args: { order_id_param: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          check_user_id: string
+          required_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       migrate_cart_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      process_existing_orders_for_lottery: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user" | "dtf_supplier"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -676,6 +1113,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user", "dtf_supplier"],
+    },
   },
 } as const
