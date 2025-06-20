@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -87,7 +88,7 @@ const ProductDetail = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow flex items-center justify-center">
+        <main className="flex-grow flex items-center justify-center py-8">
           <p>Chargement du produit...</p>
         </main>
         <Footer />
@@ -99,7 +100,7 @@ const ProductDetail = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow flex items-center justify-center">
+        <main className="flex-grow flex items-center justify-center py-8">
           <p>Produit non trouvé ou une erreur est survenue.</p>
         </main>
         <Footer />
@@ -217,7 +218,7 @@ const ProductDetail = () => {
                   </RadioGroup>
                 </div>
 
-                {/* Personnalisation - Modified condition */}
+                {/* Personnalisation */}
                 {product.is_customizable && (
                   <GlassCard className="p-6">
                     <div className="flex items-center gap-2 mb-4">
