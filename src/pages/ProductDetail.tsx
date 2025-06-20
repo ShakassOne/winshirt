@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { fetchProductById, fetchAllDesigns, fetchAllMockupColors, fetchAllLotteries } from '@/services/api.service';
+import { fetchProductById, fetchAllDesigns, fetchAllLotteries } from '@/services/api.service';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('M');
@@ -41,11 +41,6 @@ const ProductDetail = () => {
     queryFn: fetchAllDesigns,
   });
 
-  const { data: mockupColors } = useQuery({
-    queryKey: ['mockupColors'],
-    queryFn: fetchAllMockupColors,
-  });
-
   const { data: lotteries } = useQuery({
     queryKey: ['lotteries'],
     queryFn: fetchAllLotteries,
@@ -54,30 +49,34 @@ const ProductDetail = () => {
   const activeLotteries = lotteries?.filter(lottery => lottery.is_active) || [];
 
   useEffect(() => {
-    if (product && mockupColors) {
-      const availableColors = mockupColors.filter(color => 
-        color.product_category === product.category
-      );
-      if (availableColors.length > 0) {
-        setSelectedColor(availableColors[0].color_name);
-      }
+    if (product && product.available_colors && product.available_colors.length > 0) {
+      setSelectedColor(product.available_colors[0]);
     }
-  }, [product, mockupColors]);
+  }, [product]);
 
   const handleAddToCart = async () => {
     if (!product) return;
 
     try {
-      await addToCart(
-        product.id,
-        quantity,
-        selectedColor,
-        selectedSize,
-        selectedDesignFront,
-        selectedDesignBack,
-        selectedLottery !== 'none' ? selectedLottery : null
-      );
+      const cartItem = {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        color: selectedColor,
+        size: selectedSize,
+        image_url: product.image_url,
+        customization: (selectedDesignFront || selectedDesignBack) ? {
+          designId: selectedDesignFront || selectedDesignBack || '',
+          designName: designs?.find(d => d.id === (selectedDesignFront || selectedDesignBack))?.name,
+          designUrl: designs?.find(d => d.id === (selectedDesignFront || selectedDesignBack))?.image_url || '',
+          printPosition: selectedDesignFront ? 'front' : 'back' as 'front' | 'back',
+          printSize: 'A4',
+        } : undefined,
+        lotteries: selectedLottery !== 'none' ? [selectedLottery] : undefined
+      };
       
+      addItem(cartItem);
       toast.success(`${product.name} ajouté au panier !`);
     } catch (error) {
       console.error('Erreur lors de l\'ajout au panier:', error);
@@ -109,16 +108,12 @@ const ProductDetail = () => {
     );
   }
 
-  const availableColors = mockupColors?.filter(color => 
-    color.product_category === product.category
-  ) || [];
-
+  const availableColors = product.available_colors || [];
   const availableDesigns = designs?.filter(design => 
-    design.product_category === product.category
+    design.category === product.category
   ) || [];
 
-  const selectedColorData = availableColors.find(color => color.color_name === selectedColor);
-  const displayImage = selectedColorData?.image_url || product.image_url;
+  const displayImage = product.image_url;
 
   const formattedPrice = new Intl.NumberFormat('fr-FR', { 
     style: 'currency', 
@@ -156,7 +151,7 @@ const ProductDetail = () => {
                       Personnalisable
                     </Badge>
                   )}
-                  {product.tickets_offered > 0 && (
+                  {product.tickets_offered && product.tickets_offered > 0 && (
                     <Badge variant="outline" className="border-yellow-500 text-yellow-500">
                       <Gift className="w-3 h-3 mr-1" />
                       {product.tickets_offered} tickets
@@ -182,19 +177,19 @@ const ProductDetail = () => {
                   <div>
                     <Label className="text-base font-medium mb-3 block">Couleur: <span className="text-winshirt-blue">{selectedColor}</span></Label>
                     <RadioGroup value={selectedColor} onValueChange={setSelectedColor} className="flex flex-wrap gap-3">
-                      {availableColors.map((color) => (
-                        <div key={color.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={color.color_name} id={color.color_name} className="sr-only" />
+                      {availableColors.map((color, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <RadioGroupItem value={color} id={color} className="sr-only" />
                           <Label
-                            htmlFor={color.color_name}
-                            className={`w-12 h-12 rounded-full border-2 cursor-pointer transition-all duration-200 ${
-                              selectedColor === color.color_name 
-                                ? 'border-winshirt-purple ring-2 ring-winshirt-purple/50' 
-                                : 'border-white/20 hover:border-white/40'
+                            htmlFor={color}
+                            className={`px-4 py-2 rounded-lg border cursor-pointer transition-all duration-200 ${
+                              selectedColor === color 
+                                ? 'border-winshirt-purple bg-winshirt-purple text-white' 
+                                : 'border-white/20 hover:border-white/40 hover:bg-white/5'
                             }`}
-                            style={{ backgroundColor: color.hex_code }}
-                            title={color.color_name}
-                          />
+                          >
+                            {color}
+                          </Label>
                         </div>
                       ))}
                     </RadioGroup>
@@ -205,7 +200,7 @@ const ProductDetail = () => {
                 <div>
                   <Label className="text-base font-medium mb-3 block">Taille:</Label>
                   <RadioGroup value={selectedSize} onValueChange={setSelectedSize} className="flex flex-wrap gap-2">
-                    {['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'].map((size) => (
+                    {(product.available_sizes || ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']).map((size) => (
                       <div key={size} className="flex items-center space-x-2">
                         <RadioGroupItem value={size} id={size} className="sr-only" />
                         <Label
@@ -266,7 +261,7 @@ const ProductDetail = () => {
                 )}
 
                 {/* Participation à une loterie */}
-                {product.tickets_offered > 0 && activeLotteries.length > 0 && (
+                {product.tickets_offered && product.tickets_offered > 0 && activeLotteries.length > 0 && (
                   <GlassCard className="p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Gift className="w-5 h-5 text-winshirt-blue" />
