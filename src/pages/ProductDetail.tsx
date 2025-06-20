@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -218,45 +217,55 @@ const ProductDetail = () => {
                   </RadioGroup>
                 </div>
 
-                {/* Personnalisation */}
-                {product.is_customizable && availableDesigns.length > 0 && (
+                {/* Personnalisation - Modified condition */}
+                {product.is_customizable && (
                   <GlassCard className="p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Shirt className="w-5 h-5 text-winshirt-purple" />
                       <h3 className="text-lg font-semibold">Personnaliser ce produit</h3>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-sm font-medium mb-2 block">Design avant:</Label>
-                        <Select value={selectedDesignFront || 'none'} onValueChange={(value) => setSelectedDesignFront(value === 'none' ? null : value)}>
-                          <SelectTrigger className="bg-white/5 border-white/20">
-                            <SelectValue placeholder="Choisir un design" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Aucun design</SelectItem>
-                            {availableDesigns.map((design) => (
-                              <SelectItem key={design.id} value={design.id}>{design.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    {availableDesigns.length > 0 ? (
+                      <div className="space-y-4">
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">Design avant:</Label>
+                          <Select value={selectedDesignFront || 'none'} onValueChange={(value) => setSelectedDesignFront(value === 'none' ? null : value)}>
+                            <SelectTrigger className="bg-white/5 border-white/20">
+                              <SelectValue placeholder="Choisir un design" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Aucun design</SelectItem>
+                              {availableDesigns.map((design) => (
+                                <SelectItem key={design.id} value={design.id}>{design.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                      <div>
-                        <Label className="text-sm font-medium mb-2 block">Design arrière:</Label>
-                        <Select value={selectedDesignBack || 'none'} onValueChange={(value) => setSelectedDesignBack(value === 'none' ? null : value)}>
-                          <SelectTrigger className="bg-white/5 border-white/20">
-                            <SelectValue placeholder="Choisir un design" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Aucun design</SelectItem>
-                            {availableDesigns.map((design) => (
-                              <SelectItem key={design.id} value={design.id}>{design.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div>
+                          <Label className="text-sm font-medium mb-2 block">Design arrière:</Label>
+                          <Select value={selectedDesignBack || 'none'} onValueChange={(value) => setSelectedDesignBack(value === 'none' ? null : value)}>
+                            <SelectTrigger className="bg-white/5 border-white/20">
+                              <SelectValue placeholder="Choisir un design" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Aucun design</SelectItem>
+                              {availableDesigns.map((design) => (
+                                <SelectItem key={design.id} value={design.id}>{design.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-center py-4">
+                        <Palette className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                        <p className="text-white/60 mb-2">Aucun design disponible pour le moment</p>
+                        <p className="text-sm text-white/40">
+                          Les designs pour cette catégorie seront bientôt ajoutés !
+                        </p>
+                      </div>
+                    )}
                   </GlassCard>
                 )}
 
